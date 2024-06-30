@@ -14,10 +14,14 @@ def run():  # entrypoint from main.py
     
     
 def notate(window):
-    renderer = sdl2.ext.renderer.Renderer(window)
+    # renderer
+    renderer = sdl2.ext.renderer.Renderer(window, logical_size=(640, 480))
+    renderer.color = (0, 0, 0)
+
+    sprite_factory = sdl2.ext.SpriteFactory(renderer=renderer)
     font = sdl2.ext.ttf.FontTTF(
         font=os.path.join(os.path.curdir, "res", "Red_Hat_Display", "static", "RedHatDisplay-Regular.ttf"),
-        size=20,
+        size=120,
         color=(255, 255, 255)
     )
     text_input = Input()
@@ -32,10 +36,20 @@ def notate(window):
                 case sdl2.SDL_QUIT:
                     running = False
                 case sdl2.SDL_KEYDOWN:
-                    text_input.append(event.key.keysym.sym)
-                    texture = font.render_text(text_input.text)
-                    renderer.copy(texture)
-                    renderer.present()
+                    # print(event.key.keysym.sym)  # for debug stuff
+                    text_input.handle_char(event.key.keysym.sym)
+
+        texture = sprite_factory.from_surface(
+            font.render_text(
+                text_input.get_text() if text_input.text else "This document is empty...",
+                width=640
+            ),
+            free=True
+        )
+
+        renderer.clear()
+        renderer.copy(texture)
+        renderer.present()
                     
         window.refresh()
         
