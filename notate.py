@@ -1,6 +1,6 @@
-import sys
-import sdl2
+import os, sys, sdl2
 import sdl2.ext
+from input import Input
 
 
 def run():  # entrypoint from main.py
@@ -14,6 +14,13 @@ def run():  # entrypoint from main.py
     
     
 def notate(window):
+    renderer = sdl2.ext.renderer.Renderer(window)
+    font = sdl2.ext.ttf.FontTTF(
+        font=os.path.join(os.path.curdir, "res", "Red_Hat_Display", "static", "RedHatDisplay-Regular.ttf"),
+        size=20,
+        color=(255, 255, 255)
+    )
+    text_input = Input()
     running = True
     
     # event loop
@@ -25,7 +32,10 @@ def notate(window):
                 case sdl2.SDL_QUIT:
                     running = False
                 case sdl2.SDL_KEYDOWN:
-                    pass
+                    text_input.append(event.key.keysym.sym)
+                    texture = font.render_text(text_input.text)
+                    renderer.copy(texture)
+                    renderer.present()
                     
         window.refresh()
         
